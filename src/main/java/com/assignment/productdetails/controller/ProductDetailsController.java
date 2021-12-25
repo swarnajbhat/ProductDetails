@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.assignment.productdetails.exception.ResourceNotFoundException;
 import com.assignment.productdetails.model.Product;
-import com.assignment.productdetails.model.ProductDetails;
 import com.assignment.productdetails.service.ProductDetailsService;
 
 @RestController

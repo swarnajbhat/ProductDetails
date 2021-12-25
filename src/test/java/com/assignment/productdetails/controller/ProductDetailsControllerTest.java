@@ -1,16 +1,17 @@
-package com.assignment.productdetails.service;
+package com.assignment.productdetails.controller;
 
-import java.util.Optional;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.servlet.MockMvc;
 
-import com.assignment.productdetails.exception.ResourceNotFoundException;
 import com.assignment.productdetails.model.Enrichment;
 import com.assignment.productdetails.model.Images;
 import com.assignment.productdetails.model.Item;
@@ -18,19 +19,20 @@ import com.assignment.productdetails.model.PrimaryBrand;
 import com.assignment.productdetails.model.Product;
 import com.assignment.productdetails.model.ProductClassification;
 import com.assignment.productdetails.model.ProductDescription;
-import com.assignment.productdetails.repository.ProductDetailsRepository;
+import com.assignment.productdetails.service.ProductDetailsService;
 
 @ExtendWith(MockitoExtension.class)
-public class ProductDetailsServiceTest {
+@WebMvcTest(ProductDetailsController.class)
+public class ProductDetailsControllerTest {
 
-	@Mock
-	private ProductDetailsRepository repository;
+	@Autowired
+	private MockMvc mockmvc;
 	
-	@InjectMocks
+	@MockBean
 	private ProductDetailsService service;
 	
 	@Test
-	public void testGetProductDetailsById() throws ResourceNotFoundException { 
+	public void testGetProductDetailsById() throws Exception {
 		Product product = new Product();
 		
 		ProductDescription description = new ProductDescription();
@@ -58,11 +60,9 @@ public class ProductDetailsServiceTest {
 		product.setId("1234654");
 		product.setItem(item);
 		
-		Mockito.when(repository.findById(Mockito.anyString())).thenReturn(Optional.ofNullable(product));
+		Mockito.when(service.getProductDetailsById(Mockito.anyString())).thenReturn((product));
 		
-		Product actualProduct = service.getProductDetailsById("1234765");
-		
-		Assertions.assertThat(actualProduct.getItem().getProductDescription().getTitle().equals(("BlueRay")));
-		Mockito.verify(repository, Mockito.times(1)).findById(Mockito.anyString());
+		mockmvc.perform(get("/api/v1/productdetails/{id}",1234654))
+		.andExpectAll(jsonPath("$.item.productDescription.title").value("BlueRay"));
 	}
 }
